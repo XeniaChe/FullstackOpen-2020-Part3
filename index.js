@@ -62,17 +62,21 @@ app.delete('/api/persons/:id', (req, res) => {
 	res.status(204).end();
 });
 
-app.use(express.json());
-
 const generateID = () => {
 	return Math.floor(Math.random() * Math.floor(persons.length * 100 || 100));
 };
 
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
-
+	// console.log(body);
 	if (!body.name || !body.number) {
-		return res.status(404).json({ error: 'some contact data is missing' });
+		return res.status(409).json({ error: 'some contact data is missing' });
+	}
+
+	//newName repeating check
+	let nameRepeatCheck = persons.map((el) => el.name).includes(body.name);
+	if (nameRepeatCheck) {
+		return res.status(409).json({ error: 'name must be unique' });
 	}
 
 	const newPerson = {
