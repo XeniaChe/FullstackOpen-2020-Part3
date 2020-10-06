@@ -3,12 +3,17 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 app.use(express.json());
+
+/*
 var corsOptions = {
 	origin: '*'
 	// optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 app.use(cors(corsOptions));
+*/
+app.use(cors());
 
+/*
 app.use(function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
 	res.header(
@@ -17,6 +22,7 @@ app.use(function(req, res, next) {
 	);
 	next();
 });
+*/
 
 app.use(express.static('build'));
 
@@ -58,14 +64,21 @@ app.get('/api/persons/:id', (req, res) => {
 	Person.findById(req.params.id).then((person) => res.json(person));
 });
 
+// app.delete('/api/persons/:id', (req, res) => {
+// 	const id = +req.params.id;
+// 	persons = persons.filter((el) => el.id !== id);
+// 	res.status(204).end();
+// });
+
 app.delete('/api/persons/:id', (req, res) => {
-	const id = +req.params.id;
-	persons = persons.filter((el) => el.id !== id);
-	res.status(204).end();
+	Person.findByIdAndRemove(req.params.id).then((person) =>
+		console.log(`Object deleted`)
+	);
 });
 
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
+	console.log(body);
 
 	if (!body.name || !body.number) {
 		return res.status(409).json({ error: 'some contact data is missing' });
