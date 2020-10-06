@@ -15,36 +15,18 @@ app.use(
 	)
 );
 
-let persons = [
-	{
-		id: 1,
-		name: 'Arto Hellas',
-		number: '040-123456'
-	},
-	{
-		id: 2,
-		name: 'Ada Lovelace',
-		number: '39-44-5323523'
-	},
-	{
-		id: 3,
-		name: 'Dan Abramov',
-		number: '12-43-234345'
-	},
-	{
-		id: 4,
-		name: 'Mary Poppendick',
-		number: '39-23-6423122'
-	}
-];
+//Connecting to MongoDB
+require('dotenv').config();
+const Person = require('./models/peopleModel');
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });
 
+//Fetch all people
 app.get('/api/persons', (req, res) => {
-	res.json(persons);
+	Person.find({}).then((people) => res.json(people));
 });
 
 app.get('/api/info', (req, res) => {
@@ -56,17 +38,9 @@ app.get('/api/info', (req, res) => {
 	res.send(`<p>${info.content}</p> <p>${info.date}</p>`);
 });
 
+//Fetch sinfle person
 app.get('/api/persons/:id', (req, res) => {
-	const id = +req.params.id;
-	// console.log(req.params);
-
-	const person = persons.find((el) => el.id === id);
-
-	if (person) {
-		res.json(person);
-	} else {
-		res.status(404).end();
-	}
+	Person.findById(req.params.id).then((person) => res.json(person));
 });
 
 app.delete('/api/persons/:id', (req, res) => {
@@ -81,26 +55,17 @@ const generateID = () => {
 
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
-	// console.log(body);
+
 	if (!body.name || !body.number) {
 		return res.status(409).json({ error: 'some contact data is missing' });
 	}
 
-	//newName repeating check
-	let nameRepeatCheck = persons.map((el) => el.name).includes(body.name);
-	if (nameRepeatCheck) {
-		return res.status(409).json({ error: 'name must be unique' });
-	}
-
-	const newPerson = {
-		id: generateID(),
+	const newPerson = new Person({
 		name: body.name,
 		number: body.number
-	};
+	});
 
-	persons = persons.concat(newPerson);
-
-	res.json(newPerson);
+	newPerson.save().then((savedPerson) => res.json(savedPerson));
 });
 
 const unknownEndPoint = (req, res) => {
