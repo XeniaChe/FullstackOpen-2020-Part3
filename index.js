@@ -1,10 +1,14 @@
 const express = require('express');
 
 const app = express();
-app.use(express.json());
 const cors = require('cors');
-app.use(cors());
-/*
+app.use(express.json());
+var corsOptions = {
+	origin: '*'
+	// optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
+
 app.use(function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
 	res.header(
@@ -13,7 +17,6 @@ app.use(function(req, res, next) {
 	);
 	next();
 });
-*/
 
 app.use(express.static('build'));
 
