@@ -4,6 +4,14 @@ const app = express();
 app.use(express.json());
 const cors = require('cors');
 app.use(cors());
+app.use(function(req, res, next) {
+	res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	);
+	next();
+});
 
 app.use(express.static('build'));
 
@@ -26,7 +34,9 @@ app.listen(PORT, () => {
 
 //Fetch all people
 app.get('/api/persons', (req, res) => {
-	Person.find({}).then((people) => res.json(people));
+	Person.find({})
+		.then((people) => res.json(people))
+		.catch((error) => console.log(error.message));
 });
 
 app.get('/api/info', (req, res) => {
@@ -48,10 +58,6 @@ app.delete('/api/persons/:id', (req, res) => {
 	persons = persons.filter((el) => el.id !== id);
 	res.status(204).end();
 });
-
-const generateID = () => {
-	return Math.floor(Math.random() * Math.floor(persons.length * 100 || 100));
-};
 
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
