@@ -96,10 +96,12 @@ app.put('/api/persons/:id', (req, res, next) => {
 		name: body.name,
 		number: body.number
 	};
-	console.log(updatePerson.name);
-	console.log(req.params.id);
 
-	Person.findByIdAndUpdate(req.params.id, updatePerson, { new: true })
+	Person.findByIdAndUpdate(req.params.id, updatePerson, {
+		new: true,
+		runValidators: true,
+		context: 'query'
+	})
 		.then((updatedPerson) => res.json(updatedPerson))
 		.catch((error) => next(error));
 });
@@ -114,7 +116,9 @@ app.use(unknownEndPoint);
 const errorHandler = (error, req, res, next) => {
 	console.error(error.message);
 	if (error.name === 'CastError') {
-		return response.status(400).send({ error: 'malformatted id' });
+		return res.status(400).send({ error: 'malformatted id' });
+	} else if (error.name === 'ValidationError') {
+		return res.status(400).json({ error: error.message });
 	}
 
 	next(error);
