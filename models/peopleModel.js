@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
+
 const uniqueValidator = require('mongoose-unique-validator');
 
 const url = process.env.MONGODB_URL;
