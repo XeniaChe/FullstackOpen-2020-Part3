@@ -1,5 +1,7 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
-var uniqueValidator = require('mongoose-unique-validator');
+const uniqueValidator = require('mongoose-unique-validator');
 
 const url = process.env.MONGODB_URL;
 console.log(`Connecting to ${url} DB`);
@@ -10,7 +12,7 @@ mongoose
 		useFindAndModify: false,
 		useCreateIndex: true
 	})
-	.then((res) => {
+	.then(() => {
 		console.log(`connected to DB ${url}`);
 	})
 	.catch((error) => {

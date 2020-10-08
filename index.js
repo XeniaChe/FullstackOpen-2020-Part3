@@ -1,4 +1,6 @@
+/* eslint-disable prefer-destructuring */
 const express = require('express');
+
 const app = express();
 const cors = require('cors');
 
@@ -7,6 +9,7 @@ app.use(express.json());
 app.use(cors());
 
 const morgan = require('morgan');
+
 morgan.token('data', (req, res) => JSON.stringify(req.body));
 app.use(
 	morgan(
@@ -14,7 +17,7 @@ app.use(
 	)
 );
 
-//Connecting to MongoDB
+// Connecting to MongoDB
 require('dotenv').config();
 const Person = require('./models/peopleModel');
 
@@ -23,7 +26,7 @@ app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);
 });
 
-//Fetch all people
+// Fetch all people
 app.get('/api/persons', (req, res, next) => {
 	Person.find({})
 		.then((people) => res.json(people))
@@ -35,7 +38,7 @@ app.get('/api/info', (req, res, next) => {
 		.then((count) => {
 			if (count) {
 				const info = {
-					count: count,
+					count,
 					date: new Date()
 				};
 				res.send(
@@ -48,7 +51,7 @@ app.get('/api/info', (req, res, next) => {
 		.catch((error) => next(error));
 });
 
-//Fetch single person
+// Fetch single person
 app.get('/api/persons/:id', (req, response, next) => {
 	Person.findById(req.params.id)
 		.then((person) => {
@@ -64,12 +67,13 @@ app.get('/api/persons/:id', (req, response, next) => {
 app.delete('/api/persons/:id', (req, res, next) => {
 	Person.findByIdAndRemove(req.params.id)
 		.then((result) => {
-			console.log(`Object deleted`);
+			console.log('Object deleted');
 			res.status(204).end();
 		})
 		.catch((error) => next(error));
 });
 
+// eslint-disable-next-line consistent-return
 app.post('/api/persons', (req, res, next) => {
 	const body = req.body;
 	console.log(body);
@@ -106,18 +110,20 @@ app.put('/api/persons/:id', (req, res, next) => {
 		.catch((error) => next(error));
 });
 
-//UnknownEndpoin middleware
+// UnknownEndpoin middleware
 const unknownEndPoint = (req, res) => {
 	res.status(404).send({ error: 'unknown endpoint' });
 };
 app.use(unknownEndPoint);
 
-//Handler for requests with error
+// Handler for requests with error
+// eslint-disable-next-line consistent-return
 const errorHandler = (error, req, res, next) => {
 	console.error(error.message);
 	if (error.name === 'CastError') {
 		return res.status(400).send({ error: 'malformatted id' });
-	} else if (error.name === 'ValidationError') {
+	}
+	if (error.name === 'ValidationError') {
 		return res.status(400).json({ error: error.message });
 	}
 
